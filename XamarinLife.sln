@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamarinLife.UWP", "XamarinLife\XamarinLife.UWP\XamarinLife.UWP.csproj", "{FFBED7DF-F195-41B2-9FA4-142C753DB144}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamarinLife.UWP", "XamarinLife.UWP\XamarinLife.UWP.csproj", "{FFBED7DF-F195-41B2-9FA4-142C753DB144}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamarinLife.Android", "XamarinLife\XamarinLife.Android\XamarinLife.Android.csproj", "{63188FB4-093C-4237-A048-EB1FEB00536F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamarinLife.Android", "XamarinLife.Android\XamarinLife.Android.csproj", "{63188FB4-093C-4237-A048-EB1FEB00536F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamarinLife.iOS", "XamarinLife\XamarinLife.iOS\XamarinLife.iOS.csproj", "{5B64364E-7FEA-4EBB-8CC6-2AD1D3728C59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamarinLife.iOS", "XamarinLife.iOS\XamarinLife.iOS.csproj", "{5B64364E-7FEA-4EBB-8CC6-2AD1D3728C59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamarinLife", "XamarinLife\XamarinLife\XamarinLife.csproj", "{10367B62-E9CA-45D6-B526-875D7022D270}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamarinLife", "XamarinLife\XamarinLife.csproj", "{10367B62-E9CA-45D6-B526-875D7022D270}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamarinLife.Engine", "XamarinLife.Engine\XamarinLife.Engine.csproj", "{B38D3086-3436-4FCC-AA7A-81D8CC62D638}"
 EndProject
