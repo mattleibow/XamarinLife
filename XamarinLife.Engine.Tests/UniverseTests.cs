@@ -91,7 +91,7 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(5, 5);
-				SetUniverse(universe, initial);
+				universe.SetUniverse(initial);
 
 				var changed = universe.Tick();
 
@@ -104,7 +104,7 @@ namespace XamarinLife.Engine.Tests
 					0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0,
 				};
-				CompareUniverse(expected, universe);
+				UniverseAssert.Equal(expected, universe);
 			}
 
 			[Fact]
@@ -120,12 +120,12 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(5, 5);
-				SetUniverse(universe, initial);
+				universe.SetUniverse(initial);
 
 				var changed = universe.Tick();
 
 				Assert.False(changed);
-				CompareUniverse(initial, universe);
+				UniverseAssert.Equal(initial, universe);
 			}
 
 			[Fact]
@@ -141,7 +141,7 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(5, 5);
-				SetUniverse(universe, initial);
+				universe.SetUniverse(initial);
 
 				var changed = universe.Tick();
 
@@ -154,7 +154,7 @@ namespace XamarinLife.Engine.Tests
 					0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0,
 				};
-				CompareUniverse(expected, universe);
+				UniverseAssert.Equal(expected, universe);
 			}
 
 			[Fact]
@@ -170,7 +170,7 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(5, 5);
-				SetUniverse(universe, initial);
+				universe.SetUniverse(initial);
 
 				var changed = universe.Tick();
 
@@ -183,7 +183,7 @@ namespace XamarinLife.Engine.Tests
 					0, 1, 1, 1, 0,
 					0, 0, 0, 0, 0,
 				};
-				CompareUniverse(expected, universe);
+				UniverseAssert.Equal(expected, universe);
 			}
 
 			[Fact]
@@ -199,12 +199,12 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(6, 5);
-				SetUniverse(universe, initial);
+				universe.SetUniverse(initial);
 
 				var changed = universe.Tick();
 
 				Assert.False(changed);
-				CompareUniverse(initial, universe);
+				UniverseAssert.Equal(initial, universe);
 			}
 
 			[Fact]
@@ -228,17 +228,17 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(5, 5);
-				SetUniverse(universe, step1);
+				universe.SetUniverse(step1);
 
 				var changed = universe.Tick();
 				Assert.True(changed);
 
-				CompareUniverse(step2, universe);
+				UniverseAssert.Equal(step2, universe);
 
 				changed = universe.Tick();
 				Assert.True(changed);
 
-				CompareUniverse(step1, universe);
+				UniverseAssert.Equal(step1, universe);
 			}
 		}
 
@@ -257,7 +257,7 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(5, 5);
-				SetUniverse(universe, initial);
+				universe.SetUniverse(initial);
 
 				var neighbors = universe.CountNeighbors(2, 2);
 				Assert.Equal(0, neighbors);
@@ -276,7 +276,7 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(5, 5);
-				SetUniverse(universe, initial);
+				universe.SetUniverse(initial);
 
 				var neighbors = universe.CountNeighbors(2, 2);
 				Assert.Equal(0, neighbors);
@@ -295,7 +295,7 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(5, 5);
-				SetUniverse(universe, initial);
+				universe.SetUniverse(initial);
 
 				var neighbors = universe.CountNeighbors(2, 2);
 				Assert.Equal(1, neighbors);
@@ -314,7 +314,7 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(5, 5);
-				SetUniverse(universe, initial);
+				universe.SetUniverse(initial);
 
 				var neighbors = universe.CountNeighbors(2, 2);
 				Assert.Equal(1, neighbors);
@@ -333,7 +333,7 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(5, 5);
-				SetUniverse(universe, initial);
+				universe.SetUniverse(initial);
 
 				var neighbors = universe.CountNeighbors(2, 2);
 				Assert.Equal(8, neighbors);
@@ -352,46 +352,30 @@ namespace XamarinLife.Engine.Tests
 				};
 
 				var universe = new Universe(5, 5);
-				SetUniverse(universe, initial);
+				universe.SetUniverse(initial);
 
 				var neighbors = universe.CountNeighbors(2, 2);
 				Assert.Equal(8, neighbors);
 			}
 		}
 
-		private static void CompareUniverse(int[] expected, Universe actual)
+		public class Randomize
 		{
-			if (actual.Size != expected.Length)
-				throw new ArgumentOutOfRangeException(nameof(expected));
-
-			for (var x = 0; x < actual.Width; x++)
+			[Fact]
+			public void RandomUniverseIsNotEmptyAndValid()
 			{
-				for (var y = 0; y < actual.Height; y++)
+				var universe = new Universe(10, 10);
+				universe.Randomize();
+
+				var hasAlive = false;
+				foreach (var cell in universe)
 				{
-					var cellState = expected[x + (y * actual.Width)] == 0
-						? CellState.Dead
-						: CellState.Alive;
-
-					Assert.Equal(cellState, actual[x, y]);
+					if (cell == CellState.Alive)
+						hasAlive = true;
+					else
+						Assert.Equal(CellState.Dead, cell);
 				}
-			}
-		}
-
-		private static void SetUniverse(Universe universe, int[] state)
-		{
-			if (universe.Size != state.Length)
-				throw new ArgumentOutOfRangeException(nameof(state));
-
-			for (var x = 0; x < universe.Width; x++)
-			{
-				for (var y = 0; y < universe.Height; y++)
-				{
-					var cellState = state[x + (y * universe.Width)] == 0
-						? CellState.Dead
-						: CellState.Alive;
-
-					universe[x, y] = cellState;
-				}
+				Assert.True(hasAlive);
 			}
 		}
 	}

@@ -116,6 +116,19 @@ namespace XamarinLife.Engine
 			return count;
 		}
 
+		public void Randomize()
+		{
+			var rnd = new Random();
+
+			for (var x = 0; x < Width; x++)
+			{
+				for (var y = 0; y < Height; y++)
+				{
+					cells[x, y] = (CellState)rnd.Next(2);
+				}
+			}
+		}
+
 		// IEnumerable<T>
 
 		public IEnumerator<CellState> GetEnumerator()
