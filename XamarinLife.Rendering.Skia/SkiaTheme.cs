@@ -7,5 +7,7 @@ namespace XamarinLife.Rendering.Skia
 		public SKColor Background { get; set; } = SKColors.White;
 
 		public SKColor Foreground { get; set; } = SKColors.Black;
+		
+		public int CellSize { get; set; } = 10;
 	}
 }

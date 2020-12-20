@@ -151,6 +151,18 @@
     <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\XamarinLife.Engine\XamarinLife.Engine.csproj">
+      <Project>{b38d3086-3436-4fcc-aa7a-81d8cc62d638}</Project>
+      <Name>XamarinLife.Engine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XamarinLife.Rendering.Skia\XamarinLife.Rendering.Skia.csproj">
+      <Project>{28abffc1-d0d5-4291-b7a2-b848a2efc7de}</Project>
+      <Name>XamarinLife.Rendering.Skia</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XamarinLife.Rendering\XamarinLife.Rendering.csproj">
+      <Project>{e33f0938-91a3-4039-a2e0-82a1a8755748}</Project>
+      <Name>XamarinLife.Rendering</Name>
+    </ProjectReference>
     <ProjectReference Include="..\XamarinLife\XamarinLife.csproj">
       <Project>{8108CF12-5D1F-4E1A-B357-8BCDC81B2BFB}</Project>
       <Name>XamarinLife</Name>

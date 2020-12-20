@@ -16,4 +16,10 @@
     <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\XamarinLife.Engine\XamarinLife.Engine.csproj" />
+    <ProjectReference Include="..\XamarinLife.Rendering.Skia\XamarinLife.Rendering.Skia.csproj" />
+    <ProjectReference Include="..\XamarinLife.Rendering\XamarinLife.Rendering.csproj" />
+  </ItemGroup>
+
 </Project>

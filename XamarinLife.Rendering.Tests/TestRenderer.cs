@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using SkiaSharp;
 using XamarinLife.Engine;
 using XamarinLife.Rendering.Skia;
@@ -26,19 +27,37 @@ namespace XamarinLife.Rendering.Tests
 			{
 				Width = surfaceWidth,
 				Height = surfaceHeight,
-				Canvas = canvas
+				Canvas = canvas,
 			};
 			theme = new SkiaTheme
 			{
 				Background = SKColors.White,
 				Foreground = SKColors.Black,
+				CellSize = 3,
 			};
 
 			renderer.UpdateTheme(theme);
 		}
 
-		public void DrawUniverse(Universe universe) =>
+		public int Width => bitmap.Width;
+
+		public int Height => bitmap.Height;
+
+		public int CellSize => theme.CellSize;
+
+		public void DrawUniverse(Universe universe)
+		{
+			// offset a bit to consider bounds changes
+			var offX = universe.Width - universe.InitialWidth;
+			var offY = universe.Height - universe.InitialHeight;
+			canvas.Translate(offX * CellSize / 2f, offY * CellSize / 2f);
+
 			renderer.DrawUniverse(universe, drawingSurface);
+
+			//using var pixmap = bitmap.PeekPixels();
+			//using var file = File.Create("test.png");
+			//pixmap.Encode(file, SKEncodedImageFormat.Png, 100);
+		}
 
 		public SKColor GetPixel(int x, int y) =>
 			bitmap.GetPixel(x, y);

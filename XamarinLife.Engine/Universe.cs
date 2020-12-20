@@ -6,47 +6,84 @@ namespace XamarinLife.Engine
 {
 	public class Universe : IEnumerable<CellState>
 	{
-		private CellState[,] cells;
-		private CellState[,] tempCells;
+		private CellStates cells = new CellStates();
+		private CellStates tempCells = new CellStates();
 
-		public Universe(int width, int height)
+		public Universe(int initialWidth, int initialHeight)
 		{
-			if (width <= 0)
-				throw new ArgumentOutOfRangeException(nameof(width));
-			if (height <= 0)
-				throw new ArgumentOutOfRangeException(nameof(height));
+			if (initialWidth <= 0)
+				throw new ArgumentOutOfRangeException(nameof(initialWidth));
+			if (initialHeight <= 0)
+				throw new ArgumentOutOfRangeException(nameof(initialHeight));
 
-			Width = width;
-			Height = height;
+			InitialWidth = initialWidth;
+			InitialHeight = initialHeight;
 
-			cells = new CellState[width, height];
+			Reset();
 		}
 
-		public int Width { get; }
+		public int InitialWidth { get; }
 
-		public int Height { get; }
+		public int InitialHeight { get; }
+
+		public int MinimumX { get; private set; }
+
+		public int MinimumY { get; private set; }
+
+		public int MaximumX { get; private set; }
+
+		public int MaximumY { get; private set; }
+
+		public int Width => MaximumX - MinimumX + 1;
+
+		public int Height => MaximumY - MinimumY + 1;
 
 		public int Size => Width * Height;
 
+		public int AliveCells => cells.Count;
+
 		public CellState this[int x, int y]
 		{
-			get => cells[x, y];
-			set => cells[x, y] = value;
+			get => cells.TryGetValue((x, y), out var state) ? state : CellState.Dead;
+			set
+			{
+				cells.TryGetValue((x, y), out var oldState);
+				if (oldState != value)
+				{
+					if (value == CellState.Alive)
+					{
+						cells[(x, y)] = value;
+
+						// expand the bounds
+						if (x < MinimumX)
+							MinimumX = x;
+						if (x > MaximumX)
+							MaximumX = x;
+						if (y < MinimumY)
+							MinimumY = y;
+						if (y > MaximumY)
+							MaximumY = y;
+					}
+					else
+					{
+						cells.Remove((x, y));
+					}
+
+					OnCellsChanged();
+				}
+			}
 		}
 
 		public bool Tick()
 		{
 			var hasChanged = false;
 
-			// lazy create the temp cells
-			tempCells ??= new CellState[Width, Height];
-
-			for (var x = 0; x < Width; x++)
+			for (var y = MinimumY - 1; y <= MaximumY + 1; y++)
 			{
-				for (var y = 0; y < Height; y++)
+				for (var x = MinimumX - 1; x <= MaximumX + 1; x++)
 				{
 					// read the current state
-					var currentState = cells[x, y];
+					cells.TryGetValue((x, y), out var currentState);
 					var previousState = currentState;
 					var neighbors = CountNeighbors(x, y);
 
@@ -78,7 +115,24 @@ namespace XamarinLife.Engine
 					}
 
 					// update the temp board
-					tempCells[x, y] = currentState;
+					if (currentState == CellState.Alive)
+					{
+						tempCells[(x, y)] = currentState;
+
+						// expand the bounds
+						if (x < MinimumX)
+							MinimumX = x;
+						if (x > MaximumX)
+							MaximumX = x;
+						if (y < MinimumY)
+							MinimumY = y;
+						if (y > MaximumY)
+							MaximumY = y;
+					}
+					else
+					{
+						tempCells.Remove((x, y));
+					}
 
 					// track changes
 					if (previousState != currentState)
@@ -89,26 +143,45 @@ namespace XamarinLife.Engine
 			// swap all cells by swapping fields
 			(cells, tempCells) = (tempCells, cells);
 
+			if (hasChanged)
+				OnCellsChanged();
+
 			return hasChanged;
+		}
+
+		public void Clear()
+		{
+			cells.Clear();
+			OnCellsChanged();
+		}
+
+		public void Reset()
+		{
+			cells.Clear();
+			MinimumX = InitialWidth / -2;
+			MinimumY = InitialHeight / -2;
+			MaximumX = MinimumX + InitialWidth - 1;
+			MaximumY = MinimumY + InitialHeight - 1;
+			OnCellsChanged();
 		}
 
 		public int CountNeighbors(int x, int y)
 		{
 			var count = 0;
 
-			var minX = Math.Max(x - 1, 0);
-			var maxX = Math.Min(x + 1, Width - 1);
-			var minY = Math.Max(y - 1, 0);
-			var maxY = Math.Min(y + 1, Height - 1);
+			var minX = Math.Max(x - 1, MinimumX);
+			var maxX = Math.Min(x + 1, MaximumX);
+			var minY = Math.Max(y - 1, MinimumY);
+			var maxY = Math.Min(y + 1, MaximumY);
 
-			for (var checkX = minX; checkX <= maxX; checkX++)
+			for (var checkY = minY; checkY <= maxY; checkY++)
 			{
-				for (var checkY = minY; checkY <= maxY; checkY++)
+				for (var checkX = minX; checkX <= maxX; checkX++)
 				{
 					if (checkX == x && checkY == y)
 						continue;
 
-					if (cells[checkX, checkY] == CellState.Alive)
+					if (cells.TryGetValue((checkX, checkY), out var state) && state == CellState.Alive)
 						count++;
 				}
 			}
@@ -120,21 +193,36 @@ namespace XamarinLife.Engine
 		{
 			var rnd = new Random();
 
-			for (var x = 0; x < Width; x++)
+			for (var y = MinimumY; y <= MaximumY; y++)
 			{
-				for (var y = 0; y < Height; y++)
+				for (var x = MinimumX; x <= MaximumX; x++)
 				{
-					cells[x, y] = (CellState)rnd.Next(2);
+					if (rnd.Next(2) == 1)
+						cells[(x, y)] = CellState.Alive;
+					else
+						cells.Remove((x, y));
 				}
 			}
+
+			OnCellsChanged();
 		}
+
+		public event EventHandler CellsChanged;
+
+		protected virtual void OnCellsChanged() =>
+			CellsChanged?.Invoke(this, EventArgs.Empty);
 
 		// IEnumerable<T>
 
 		public IEnumerator<CellState> GetEnumerator()
 		{
-			foreach (var cell in cells)
-				yield return cell;
+			for (var y = MinimumY; y <= MaximumY; y++)
+			{
+				for (var x = MinimumX; x <= MaximumX; x++)
+				{
+					yield return this[x, y];
+				}
+			}
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() =>

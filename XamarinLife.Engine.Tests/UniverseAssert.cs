@@ -18,9 +18,17 @@ namespace XamarinLife.Engine.Tests
 						? CellState.Dead
 						: CellState.Alive;
 
-					Assert.Equal(cellState, actual[x, y]);
+					Assert.Equal(cellState, actual[actual.MinimumX + x, actual.MinimumY + y]);
 				}
 			}
+		}
+
+		public static void BoundsEqual(int minX, int minY, int width, int height, Universe actual)
+		{
+			Assert.Equal(minX, actual.MinimumX);
+			Assert.Equal(minY, actual.MinimumY);
+			Assert.Equal(width, actual.Width);
+			Assert.Equal(height, actual.Height);
 		}
 	}
 }
