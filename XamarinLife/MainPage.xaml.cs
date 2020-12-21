@@ -1,4 +1,5 @@
 ﻿using System;
+using SkiaSharp;
 using SkiaSharp.Views.Forms;
 using Xamarin.Forms;
 using XamarinLife.Engine;
@@ -12,12 +13,15 @@ namespace XamarinLife
 
 		private SkiaRenderer renderer = new SkiaRenderer();
 		private SkiaDrawingSurface drawingSurface = new SkiaDrawingSurface();
+		private SkiaViewport viewport = new SkiaViewport();
 
 		public MainPage()
 		{
 			InitializeComponent();
 
 			universe.CellsChanged += OnCellsChanged;
+
+			renderer.SetViewport(viewport);
 		}
 
 		private void OnCellsChanged(object sender, EventArgs e)
@@ -31,7 +35,7 @@ namespace XamarinLife
 			drawingSurface.Width = e.Info.Width;
 			drawingSurface.Height = e.Info.Height;
 
-			e.Surface.Canvas.Translate(offsetX, 0);
+			e.Surface.Canvas.Translate(scrollOffest);
 
 			renderer.DrawUniverse(universe, drawingSurface);
 		}
@@ -51,11 +55,47 @@ namespace XamarinLife
 			universe.Tick();
 		}
 
-		int offsetX = 0;
+		SKPoint scrollOffest;
+		SKPoint downLocation;
 
 		private void OnTouch(object sender, SKTouchEventArgs e)
 		{
-			offsetX++;
+			switch (e.ActionType)
+			{
+				case SKTouchAction.Pressed:
+					downLocation = e.Location;
+					break;
+				case SKTouchAction.Moved when e.InContact:
+					scrollOffest += e.Location - downLocation;
+					downLocation = e.Location;
+					canvasView.InvalidateSurface();
+					break;
+				case SKTouchAction.WheelChanged:
+					var val = cellSizeSlider.Value + (e.WheelDelta / 100.0);
+					cellSizeSlider.Value = Math.Round(val, 0);
+					break;
+			}
+
+			e.Handled = true;
+		}
+
+		private void OnCellSizeChanged(object sender, ValueChangedEventArgs e)
+		{
+			var oldValue = e.OldValue;
+			var newValue = (int)e.NewValue;
+
+			if (e.OldValue > 0)
+			{
+				var dx = scrollOffest.X / oldValue;
+				var dy = scrollOffest.Y / oldValue;
+
+				dx *= newValue;
+				dy *= newValue;
+
+				scrollOffest = new SKPoint((float)dx, (float)dy);
+			}
+
+			viewport.CellSize = newValue;
 			canvasView.InvalidateSurface();
 		}
 	}

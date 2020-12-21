@@ -11,6 +11,7 @@ namespace XamarinLife.Rendering.Tests
 		private SkiaRenderer renderer;
 		private SkiaDrawingSurface drawingSurface;
 		private SkiaTheme theme;
+		private SkiaViewport viewport;
 
 		private SKBitmap bitmap;
 		private SKCanvas canvas;
@@ -33,17 +34,21 @@ namespace XamarinLife.Rendering.Tests
 			{
 				Background = SKColors.White,
 				Foreground = SKColors.Black,
+			};
+			viewport = new SkiaViewport
+			{
 				CellSize = 3,
 			};
 
 			renderer.UpdateTheme(theme);
+			renderer.SetViewport(viewport);
 		}
 
 		public int Width => bitmap.Width;
 
 		public int Height => bitmap.Height;
 
-		public int CellSize => theme.CellSize;
+		public int CellSize => viewport.CellSize;
 
 		public void DrawUniverse(Universe universe)
 		{

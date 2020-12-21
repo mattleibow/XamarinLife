@@ -8,7 +8,7 @@ namespace XamarinLife.Rendering.Skia
 		private SKPaint aliveCellPaint;
 		private SKPaint deadCellPaint;
 		private SKColor backgroundColor;
-		private int cellSize;
+		private SkiaViewport viewport;
 
 		public SkiaRenderer()
 		{
@@ -23,7 +23,9 @@ namespace XamarinLife.Rendering.Skia
 				Color = SKColors.Black,
 				StrokeWidth = 1,
 			};
-			cellSize = 10;
+
+			SetViewport(new SkiaViewport());
+			UpdateTheme(new SkiaTheme());
 		}
 
 		void IUniverseRenderer.UpdateTheme(IDrawingTheme theme) =>
@@ -34,8 +36,13 @@ namespace XamarinLife.Rendering.Skia
 			backgroundColor = theme.Background;
 			aliveCellPaint.Color = theme.Foreground;
 			deadCellPaint.Color = theme.Foreground;
-			cellSize = theme.CellSize;
 		}
+
+		void IUniverseRenderer.SetViewport(IViewport viewport) =>
+			SetViewport((SkiaViewport)viewport);
+
+		public void SetViewport(SkiaViewport viewport) =>
+			this.viewport = viewport;
 
 		void IUniverseRenderer.DrawUniverse(Universe universe, IDrawingSurface surface) =>
 			DrawUniverse(universe, (SkiaDrawingSurface)surface);
@@ -46,19 +53,24 @@ namespace XamarinLife.Rendering.Skia
 
 			canvas.Clear(backgroundColor);
 
-			var offX = universe.InitialWidth % 2 == 1 ? cellSize : 0;
-			var offY = universe.InitialHeight % 2 == 1 ? cellSize : 0;
+			var offX = universe.InitialWidth % 2 == 1 ? viewport.CellSize : 0;
+			var offY = universe.InitialHeight % 2 == 1 ? viewport.CellSize : 0;
 			canvas.Translate((surface.Width - offX) / 2f, (surface.Height - offY) / 2f);
 
 			for (var y = universe.MinimumY; y <= universe.MaximumY; y++)
 			{
 				for (var x = universe.MinimumX; x <= universe.MaximumX; x++)
 				{
-					var cellRect = SKRect.Create(x * cellSize, y * cellSize, cellSize, cellSize);
 					var state = universe[x, y];
 					var paint = state == CellState.Alive
 						? aliveCellPaint
 						: deadCellPaint;
+
+					var cellRect = SKRect.Create(
+						x * viewport.CellSize,
+						y * viewport.CellSize,
+						viewport.CellSize,
+						viewport.CellSize);
 
 					canvas.DrawRect(cellRect, paint);
 				}

@@ -7,5 +7,7 @@ namespace XamarinLife.Rendering
 		void DrawUniverse(Universe universe, IDrawingSurface surface);
 
 		void UpdateTheme(IDrawingTheme theme);
+
+		void SetViewport(IViewport viewport);
 	}
 }
